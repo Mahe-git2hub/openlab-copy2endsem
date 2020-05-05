@@ -18,14 +18,18 @@ Original file is located at
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
+
 import spacy
 from spacy.matcher import PhraseMatcher
 from spacy import displacy
-from collections import Counter
-import en_core_web_sm
-from db_creator import Login
+try:
+    nlp = spacy.load('en_core_web_sm')
+except Exception:
+    import en_core_web_sm
+    nlp = en_core_web_sm.load()
 
-nlp = en_core_web_sm.load()
+from collections import Counter
+from db_creator import Login
 from pprint import pprint
 
 from pathlib import Path

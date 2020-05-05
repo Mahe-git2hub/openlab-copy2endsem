@@ -265,4 +265,4 @@ def index():
 
 if __name__ == '__main__':
     print("Use the following links if don't have any :\n", link1, '\n', link2, '\n', link3)
-    app.run()
+    app.run(debug=True)

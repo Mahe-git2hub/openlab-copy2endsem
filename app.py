@@ -22,6 +22,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 import spacy
 from spacy.matcher import PhraseMatcher
 from spacy import displacy
+
 # try:
 nlp = spacy.load('en_core_web_sm')
 # except Exception:
@@ -46,7 +47,7 @@ import nltk
 import threading
 from nltk.corpus import stopwords
 
-nltk.download('stopwords')
+# nltk.download('stopwords')
 
 link1 = 'https://www.thehindu.com/news/national/centre-may-raise-loan-to-pay-shortfall-of-gst-compensation-amount' \
         '/article31329841.ece?homepage=true '
@@ -68,7 +69,6 @@ stop_words = stop_words.union(new_stopwords)
 #     return ''.join(random.choice(chars) for _ in range(20))
 
 
-objects = []
 url = None
 urlop = None
 engine = create_engine('sqlite:///namma_db.db')
@@ -148,16 +148,17 @@ print(Counter(labels))
 items = [x.text for x in article.ents]
 print(Counter(items).most_common(15))
 
+print('\n\n if below works there is no pblm with sents of nlp')
 sentences = [x for x in article.sents]
 # any sentence can be selected randomly
 sent_num = 10
-print(sentences[sent_num])
+print(sentences[sent_num], '\n\n')
 
 
 # sentence and its dependencies
 @app.route('/pos', defaults={'pos_article': urlop, 'sent_nums': 10})
-@app.route('/pos/<int:sent_nums>', methods=['GET'])
-def PartsofSpeech(pos_article=urlop, sent_nums=10):
+@app.route('/pos/<pos_article>/<int:sent_nums>', methods=['GET'])
+def PartsofSpeech(pos_article: nlp = urlop, sent_nums=10):
     sentences_pos = [x for x in pos_article.sents]
     # any sentence can be selected randomly default is 10
     svg = displacy.render(nlp(str(sentences_pos[sent_nums])), style='dep', jupyter=False, options={'distance': 70})
@@ -168,11 +169,9 @@ def PartsofSpeech(pos_article=urlop, sent_nums=10):
 
 
 @app.route('/NER/<ner_article>', methods=['GET'])
-def NER(ner_article):
-    ner_obj = displacy.render(ner_article, style='ent', jupyter=False)
-    global objects
-    objects.append(ner_obj)
-    return redirect(url_for('wc', wc_article=url_to_string(url)))
+def NER(ner_article=urlop):
+    ner_obj = displacy.render(ner_article, style='ent', jupyter=False, page=True)
+    return render_template('display.html', ner_body=ner_obj)
 
 
 #
@@ -189,24 +188,7 @@ def NER(ner_article):
 # doc2 = nlp("This is another sentence.")
 # html = displacy.render([doc1, doc2], style="dep", page=True)
 
-# wordcloud = WordCloud(width=8000, height=8000, background_color='white', min_font_size=10,
-#                       stopwords=stop_words).generate(url_to_string(link1))
-# plt.figure(figsize=(20, 28), facecolor=None)
-# plt.imshow(wordcloud)
-# plt.axis("off")
-# plt.tight_layout(pad=0)
-#
-# plt.show()
 
-@app.route('/final')
-def final():
-    global objects
-    with open('../templates/test.html', 'w') as f:
-        f.writelines(objects)
-    return render_template('test.html')
-
-
-@app.route('/wcloud/<wc_article>')
 def wc(wc_article):
     wordcloud = WordCloud(width=8000, height=8000, background_color='white', min_font_size=10,
                           stopwords=stop_words).generate(wc_article)
@@ -216,7 +198,6 @@ def wc(wc_article):
     plt.tight_layout(pad=0)
     plt.savefig('wordcloud.png', dpi='figure')
     plt.show()
-    return redirect(url_for('final'))
 
 
 @app.route('/login', methods=["GET", "POST"])
@@ -255,8 +236,9 @@ def display():
         print('nlp content: ', nlp_content)
         global urlop
         urlop = nlp_content
-        return redirect(
-            url_for('PartsofSpeech', pos_article=nlp_content, sent_nums=input('Enter the number of sentences\t')))
+        return redirect(url_for('NER', ner_article=nlp_content))
+        # return redirect(
+        #     url_for('PartsofSpeech', pos_article=nlp_content, sent_nums=input('Enter the number of sentences\t')))
 
 
 @app.route('/', methods=['GET'])

@@ -22,11 +22,11 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 import spacy
 from spacy.matcher import PhraseMatcher
 from spacy import displacy
-try:
-    nlp = spacy.load('en_core_web_sm')
-except Exception:
-    import en_core_web_sm
-    nlp = en_core_web_sm.load()
+# try:
+nlp = spacy.load('en_core_web_sm')
+# except Exception:
+#     import en_core_web_sm
+#     nlp = en_core_web_sm.load()
 
 from collections import Counter
 from db_creator import Login
@@ -70,7 +70,7 @@ stop_words = stop_words.union(new_stopwords)
 
 objects = []
 url = None
-
+urlop = None
 engine = create_engine('sqlite:///namma_db.db')
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
@@ -135,29 +135,29 @@ def string_to_nlp(s: str):
     return nlp(s)
 
 
-# art = url_to_string(link2)
-# article = nlp(art)
-# print(article.ents)
-# print(string_to_nlp(art).ents)
-#
-# print(len(string_to_nlp(url_to_string(link3))))
-#
-# labels = [x.label_ for x in article.ents]
-# print(Counter(labels))
-#
-# items = [x.text for x in article.ents]
-# print(Counter(items).most_common(15))
-#
-# sentences = [x for x in article.sents]
-# # any sentence can be selected randomly
-# sent_num = 10
-# print(sentences[sent_num])
+art = url_to_string(link2)
+article = nlp(art)
+print(article.ents)
+print(string_to_nlp(art).ents)
+
+print(len(string_to_nlp(url_to_string(link3))))
+
+labels = [x.label_ for x in article.ents]
+print(Counter(labels))
+
+items = [x.text for x in article.ents]
+print(Counter(items).most_common(15))
+
+sentences = [x for x in article.sents]
+# any sentence can be selected randomly
+sent_num = 10
+print(sentences[sent_num])
 
 
 # sentence and its dependencies
-@app.route('/pos', defaults={'pos_article': link3, 'sent_nums': 10})
-@app.route('/pos/<string:pos_article>/<int:sent_nums>', methods=['GET'])
-def PartsofSpeech(pos_article, sent_nums=10):
+@app.route('/pos', defaults={'pos_article': urlop, 'sent_nums': 10})
+@app.route('/pos/<int:sent_nums>', methods=['GET'])
+def PartsofSpeech(pos_article=urlop, sent_nums=10):
     sentences_pos = [x for x in pos_article.sents]
     # any sentence can be selected randomly default is 10
     svg = displacy.render(nlp(str(sentences_pos[sent_nums])), style='dep', jupyter=False, options={'distance': 70})
@@ -253,8 +253,10 @@ def display():
         string_content_url = url_to_string(str(url))
         nlp_content = string_to_nlp(string_content_url)
         print('nlp content: ', nlp_content)
+        global urlop
+        urlop = nlp_content
         return redirect(
-            url_for('PartsofSpeech', pos_article=nlp_content, sent_nums=input('Enter the number of sentences')))
+            url_for('PartsofSpeech', pos_article=nlp_content, sent_nums=input('Enter the number of sentences\t')))
 
 
 @app.route('/', methods=['GET'])

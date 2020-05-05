@@ -56,6 +56,7 @@ link3 = 'https://www.thehindu.com/news/national/plea-to-bring-back-to-punjab-str
         '.ece?homepage=true '
 
 app = Flask(__name__)
+# run_with_ngrok(app)
 
 print('Socket : \t', socket.gethostbyname(socket.getfqdn(socket.gethostname())))
 
@@ -266,3 +267,4 @@ def index():
 if __name__ == '__main__':
     print("Use the following links if don't have any :\n", link1, '\n', link2, '\n', link3)
     app.run(debug=True)
+    # app.run()

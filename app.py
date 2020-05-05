@@ -135,23 +135,23 @@ def string_to_nlp(s: str):
     return nlp(s)
 
 
-art = url_to_string(link2)
-article = nlp(art)
-print(article.ents)
-print(string_to_nlp(art).ents)
-
-print(len(string_to_nlp(url_to_string(link3))))
-
-labels = [x.label_ for x in article.ents]
-print(Counter(labels))
-
-items = [x.text for x in article.ents]
-print(Counter(items).most_common(15))
-
-sentences = [x for x in article.sents]
-# any sentence can be selected randomly
-sent_num = 10
-print(sentences[sent_num])
+# art = url_to_string(link2)
+# article = nlp(art)
+# print(article.ents)
+# print(string_to_nlp(art).ents)
+#
+# print(len(string_to_nlp(url_to_string(link3))))
+#
+# labels = [x.label_ for x in article.ents]
+# print(Counter(labels))
+#
+# items = [x.text for x in article.ents]
+# print(Counter(items).most_common(15))
+#
+# sentences = [x for x in article.sents]
+# # any sentence can be selected randomly
+# sent_num = 10
+# print(sentences[sent_num])
 
 
 # sentence and its dependencies

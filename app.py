@@ -222,7 +222,7 @@ def login():
         if username == 'Mahesh' and password == 'WE':
             return redirect(url_for('display'))
         else:
-            return render_template('display.html')
+            return render_template('error.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])

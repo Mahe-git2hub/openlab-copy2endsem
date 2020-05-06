@@ -158,16 +158,17 @@ print(sentences[sent_num], '\n\n')
 
 
 # sentence and its dependencies
-@app.route('/pos', defaults={'pos_article': urlop, 'sent_nums': 10})
-@app.route('/pos/<pos_article>/<int:sent_nums>', methods=['GET'])
-def PartsofSpeech(pos_article: nlp = urlop, sent_nums=10):
+@app.route('/pos', defaults={'sent_nums': 10})
+@app.route('/pos/<int:sent_nums>', methods=['GET'])
+def PartsofSpeech(sent_nums=10):
+    pos_article = pickle.load(open("vocab and nlp Obj.pickle", "rb"))
     sentences_pos = [x for x in pos_article.sents]
     # any sentence can be selected randomly default is 10
     svg = displacy.render(nlp(str(sentences_pos[sent_nums])), style='dep', jupyter=False, options={'distance': 70})
     output_path = Path(os.path.join("./", "sentence.svg"))
     output_path.open('w', encoding="utf-8").write(svg)
     # sentence and its dependencies
-    return redirect(url_for('NER', ner_article=pos_article))
+    return redirect(url_for('NER'))
 
 
 @app.route('/NER', methods=['GET'])
@@ -240,12 +241,10 @@ def display():
         string_content_url = url_to_string(str(url))
         nlp_content = string_to_nlp(string_content_url)
         print('nlp content: ', nlp_content)
-        # global urlop
         pickle.dump(nlp_content, open("vocab and nlp Obj.pickle", "wb"))
 
-        return redirect(url_for('NER'))
-        # return redirect(
-        #     url_for('PartsofSpeech', pos_article=nlp_content, sent_nums=input('Enter the number of sentences\t')))
+        # return redirect(url_for('NER'))
+        return redirect(url_for('PartsofSpeech', sent_nums=input('Enter the number of sentences\t')))
 
 
 @app.route('/', methods=['GET'])
@@ -258,4 +257,4 @@ def index():
 if __name__ == '__main__':
     print("Use the following links if don't have any :\n", link1, '\n', link2, '\n', link3)
     app.run(debug=True)
-    # app.run()
+    print(' For running worldcloud open word.py ....')

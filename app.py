@@ -239,7 +239,12 @@ def display():
         return render_template('index.html')
     elif request.method == 'POST':
         global url
-        url = request.form.get('News article URL')
+        try:
+            url = request.form.get('News article URL')
+        except ConnectionError:
+            return render_template('error.html')
+        except requests.exceptions.ConnectionError:
+            return render_template('error.html')
         print(url)
         string_content_url = url_to_string(str(url))
         nlp_content = string_to_nlp(string_content_url)

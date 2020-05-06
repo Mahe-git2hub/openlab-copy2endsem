@@ -38,10 +38,11 @@ import os
 from bs4 import BeautifulSoup
 import requests
 import re
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for, session, g
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import socket
+import pickle
 
 import nltk
 import threading
@@ -57,6 +58,7 @@ link3 = 'https://www.thehindu.com/news/national/plea-to-bring-back-to-punjab-str
         '.ece?homepage=true '
 
 app = Flask(__name__)
+app.secret_key = 'mahesh'
 # run_with_ngrok(app)
 
 print('Socket : \t', socket.gethostbyname(socket.getfqdn(socket.gethostname())))
@@ -168,10 +170,14 @@ def PartsofSpeech(pos_article: nlp = urlop, sent_nums=10):
     return redirect(url_for('NER', ner_article=pos_article))
 
 
-@app.route('/NER/<ner_article>', methods=['GET'])
-def NER(ner_article=urlop):
+@app.route('/NER', methods=['GET'])
+def NER():
+    # ner_article = g.nlp_content
+    ner_article = pickle.load(open("vocab and nlp Obj.pickle", "rb"))
     ner_obj = displacy.render(ner_article, style='ent', jupyter=False, page=True)
-    return render_template('display.html', ner_body=ner_obj)
+    with open('templates/display.html', 'wb') as f:
+        f.write(bytes(ner_obj, encoding='utf-8'))
+    return render_template('display.html')
 
 
 #
@@ -234,9 +240,10 @@ def display():
         string_content_url = url_to_string(str(url))
         nlp_content = string_to_nlp(string_content_url)
         print('nlp content: ', nlp_content)
-        global urlop
-        urlop = nlp_content
-        return redirect(url_for('NER', ner_article=nlp_content))
+        # global urlop
+        pickle.dump(nlp_content, open("vocab and nlp Obj.pickle", "wb"))
+
+        return redirect(url_for('NER'))
         # return redirect(
         #     url_for('PartsofSpeech', pos_article=nlp_content, sent_nums=input('Enter the number of sentences\t')))
 

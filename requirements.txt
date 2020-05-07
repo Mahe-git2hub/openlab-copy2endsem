@@ -49,7 +49,6 @@ cymem==2.0.3
 Cython==0.29.17
 daft==0.0.4
 dask==2.12.0
-dataclasses==0.7
 datascience==0.10.6
 decorator==4.4.2
 defusedxml==0.6.0
@@ -65,7 +64,6 @@ earthengine-api==0.1.219
 easydict==1.9
 ecos==2.0.7.post1
 editdistance==0.5.3
-en-core-web-sm==2.2.5
 entrypoints==0.3
 ephem==3.7.7.1
 et-xmlfile==1.0.1

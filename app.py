@@ -93,7 +93,7 @@ def url_to_string(url_to_scrape):
     return " ".join(re.split(r'[\n\t]+', soup.get_text()))
 
 
-def string_to_nlp(s: str):
+def string_to_nlp(s):
     matcher = PhraseMatcher(nlp.vocab)
     states = ['Andhra Pradesh',
               'Arunachal Pradesh',
